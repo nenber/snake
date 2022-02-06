@@ -327,6 +327,13 @@ class snake():
         self.body[-1].dirnx = dx
         self.body[-1].dirny = dy
 
+    def addSuperCube(self):
+        self.addCube()
+        self.addCube()
+
+    def deleteCube(self):
+        self.body.pop()
+
     def draw(self, surface):
         for i, c in enumerate(self.body):
             if i == 0:
@@ -371,6 +378,8 @@ class Jeu:
     rows = 40
     fenetre = None
     snack = None
+    snackNegative = None
+    snackSuper = None
     s = None
 
     def __init__(self, jeu, *groupes):
@@ -379,6 +388,8 @@ class Jeu:
         self.s = s
         s.addCube()
         self.snack = cube(self.randomSnack(s), color=(0, 255, 0))
+        self.snackNegative = cube(self.randomSnack(s), color=(255, 0, 0))
+        self.snackSuper = cube(self.randomSnack(s), color=(250, 245, 87))
         flag = True
         clock = pygame.time.Clock()
         pygame.display.update()
@@ -394,6 +405,16 @@ class Jeu:
             if s.body[0].pos == self.snack.pos:
                 s.addCube()
                 self.snack = cube(self.randomSnack(s), color=(0, 255, 0))
+            if s.body[0].pos == self.snackSuper.pos:
+                s.addSuperCube()
+                self.snackSuper = cube(self.randomSnack(s), color=(250, 245, 87))
+            if s.body[0].pos == self.snackNegative.pos:
+                if len(s.body) == 1:
+                    s.reset((10, 10))
+                    print("You lose")
+                else:
+                    s.deleteCube()
+                self.snackNegative = cube(self.randomSnack(s), color=(255, 0, 0))
 
             for x in range(len(s.body)):
                 if s.body[x].pos in list(map(lambda z: z.pos, s.body[x+1:])):
@@ -416,6 +437,8 @@ class Jeu:
         self.drawGrid()
         self.s.draw(self.fenetre)
         self.snack.draw(self.fenetre)
+        self.snackNegative.draw(self.fenetre)
+        self.snackSuper.draw(self.fenetre)
         pygame.display.update()
         pass
 

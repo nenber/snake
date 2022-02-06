@@ -8,8 +8,8 @@ import json
 import io
 
 
-surfaceW = 1000  # Dimension de la fenêtre / Largeur
-surfaceH = 1000  # Dimension de la fenêtre / Longueur
+surfaceW = 1000
+surfaceH = 1000
 
 
 class Menu:
@@ -21,7 +21,6 @@ class Menu:
             survol=(0, 200, 200),
         )
         font = pygame.font.SysFont('Helvetica', 24, bold=True)
-        # noms des menus et commandes associées
         items = (
             ('JOUER', application.jeu),
             ('SETTINGS', application.settings),
@@ -50,27 +49,18 @@ class Menu:
         clicGauche, *_ = pygame.mouse.get_pressed()
         posPointeur = pygame.mouse.get_pos()
         for bouton in self._boutons:
-            # Si le pointeur souris est au-dessus d'un bouton
             if bouton.rect.collidepoint(*posPointeur):
-                # Changement du curseur par un quelconque
                 pygame.mouse.set_cursor(*pygame.cursors.tri_left)
-                # Changement de la couleur du bouton
                 bouton.dessiner(self.couleurs['survol'])
-                # Si le clic gauche a été pressé
                 if clicGauche:
-                    # Appel de la fonction du bouton
                     bouton.executerCommande()
                 break
             else:
-                # Le pointeur n'est pas au-dessus du bouton
                 bouton.dessiner(self.couleurs['normal'])
         else:
-            # Le pointeur n'est pas au-dessus d'un des boutons
-            # initialisation au pointeur par défaut
             pygame.mouse.set_cursor(*pygame.cursors.arrow)
 
     def detruire(self):
-        # initialisation du pointeur
         pygame.mouse.set_cursor(*pygame.cursors.arrow)
 
 
@@ -97,7 +87,6 @@ class MenuBouton(pygame.sprite.Sprite):
         self.image.blit(self.texte, self.rectTexte)
 
     def executerCommande(self):
-        # Appel de la commande du bouton
         self._commande()
 
 
@@ -112,7 +101,6 @@ class Application:
         self.fond = (150,)*3
 
         self.fenetre = pygame.display.set_mode((surfaceW, surfaceH))
-        # Groupe de sprites utilisé pour l'affichage
         self.groupeGlobal = pygame.sprite.Group()
         self.statut = True
         self.difficultyLvl = 1
@@ -120,7 +108,6 @@ class Application:
     def _initialiser(self):
         try:
             self.ecran.detruire()
-            # Suppression de tous les sprites du groupe
             self.groupeGlobal.empty()
         except AttributeError:
             pass
@@ -137,13 +124,6 @@ class Application:
         elif self.difficultyLvl == 3:
             self.difficultyLvl = 1
 
-        # with open("conf.txt", "r") as f:
-        #     lines = f.readlines()
-        # if len(lines) != 0:
-        #     lines[0] = str(self.difficultyLvl)+".\n"
-        # else:
-        #     lines.append("1\n")
-
         with open("conf.txt", "w+") as f:
             f.write(str(self.difficultyLvl))
         print(self.difficultyLvl)
@@ -151,12 +131,10 @@ class Application:
         self.settings()
 
     def menu(self):
-        # Affichage du menu
         self._initialiser()
         self.ecran = Menu(self, self.groupeGlobal)
 
     def jeu(self):
-        # Affichage du jeu
         self._initialiser()
         self.ecran = Jeu(self, self.groupeGlobal)
 
@@ -194,19 +172,14 @@ class Settings:
         )
         diffVal = ""
 
-        # Using readlines()
         file = open('conf.txt', 'r')
         Lines = file.read()
         count = 0
-        # Strips the newline character
         diffVal = Lines
         self.app = application
-        # application.difficultyLvl = int(diffVal)
         font = pygame.font.SysFont('Helvetica', 24, bold=True)
-        # noms des menus et commandes associées
         self.items = (
             ('DIFFICULTY ' + str(diffVal), app.difficulty),
-            ('SETTINGS', app.settings),
             ('RETOUR', app.menu)
         )
         x = 500
@@ -232,28 +205,19 @@ class Settings:
         clicGauche, *_ = pygame.mouse.get_pressed()
         posPointeur = pygame.mouse.get_pos()
         for bouton in self._boutons:
-            # Si le pointeur souris est au-dessus d'un bouton
             if bouton.rect.collidepoint(*posPointeur):
-                # Changement du curseur par un quelconque
                 pygame.mouse.set_cursor(*pygame.cursors.tri_left)
-                # Changement de la couleur du bouton
                 bouton.dessiner(self.couleurs['survol'])
-                # Si le clic gauche a été pressé
                 if clicGauche:
-                    # Appel de la fonction du bouton
                     r = bouton.executerCommande()
 
                 break
             else:
-                # Le pointeur n'est pas au-dessus du bouton
                 bouton.dessiner(self.couleurs['normal'])
         else:
-            # Le pointeur n'est pas au-dessus d'un des boutons
-            # initialisation au pointeur par défaut
             pygame.mouse.set_cursor(*pygame.cursors.arrow)
 
     def detruire(self):
-        # initialisation du pointeur
         pygame.mouse.set_cursor(*pygame.cursors.arrow)
 
 
@@ -262,7 +226,6 @@ class snake():
     turns = {}
 
     def __init__(self, color, pos):
-        # pos is given as coordinates on the grid ex (1,5)
         self.color = color
         self.head = cube(pos)
         self.body.append(self.head)
@@ -349,7 +312,7 @@ class cube():
     def __init__(self, start, dirnx=1, dirny=0, color=(255, 0, 0)):
         self.pos = start
         self.dirnx = dirnx
-        self.dirny = dirny  # "L", "R", "U", "D"
+        self.dirny = dirny
         self.color = color
 
     def move(self, dirnx, dirny):
@@ -373,7 +336,6 @@ class cube():
 
 
 class Jeu:
-    """ Simulacre de l'interface du jeu """
     cols = 25
     rows = 40
     fenetre = None
@@ -381,56 +343,68 @@ class Jeu:
     snackNegative = None
     snackSuper = None
     s = None
+    jeu = None
 
     def __init__(self, jeu, *groupes):
         self.fenetre = jeu.fenetre
         s = snake((255, 0, 0), (10, 10))
         self.s = s
         s.addCube()
+        self.jeu = jeu
         self.snack = cube(self.randomSnack(s), color=(0, 255, 0))
         self.snackNegative = cube(self.randomSnack(s), color=(255, 0, 0))
         self.snackSuper = cube(self.randomSnack(s), color=(250, 245, 87))
         flag = True
         clock = pygame.time.Clock()
         pygame.display.update()
+        file = open('conf.txt', 'r')
+        Lines = file.read()
+        count = 0
+        # Strips the newline character
+        difficulty = int(Lines)
         while flag:
-            pygame.time.delay(30)
-            clock.tick(10)
+            pygame.time.delay(50)
+            if difficulty == 1:
+                clock.tick(10)
+            elif difficulty == 2:
+                clock.tick(20)
+            elif difficulty == 3:
+                clock.tick(30)
             s.move()
             headPos = s.head.pos
             if headPos[0] >= 40 or headPos[0] < 0 or headPos[1] >= 40 or headPos[1] < 0:
                 print("Score:", len(s.body))
                 s.reset((10, 10))
+                flag = False
 
             if s.body[0].pos == self.snack.pos:
                 s.addCube()
                 self.snack = cube(self.randomSnack(s), color=(0, 255, 0))
             if s.body[0].pos == self.snackSuper.pos:
                 s.addSuperCube()
-                self.snackSuper = cube(self.randomSnack(s), color=(250, 245, 87))
+                self.snackSuper = cube(
+                    self.randomSnack(s), color=(250, 245, 87))
             if s.body[0].pos == self.snackNegative.pos:
                 if len(s.body) == 1:
                     s.reset((10, 10))
+                    flag = False
                     print("You lose")
                 else:
                     s.deleteCube()
-                self.snackNegative = cube(self.randomSnack(s), color=(255, 0, 0))
+                self.snackNegative = cube(
+                    self.randomSnack(s), color=(255, 0, 0))
 
             for x in range(len(s.body)):
                 if s.body[x].pos in list(map(lambda z: z.pos, s.body[x+1:])):
                     print("Score:", len(s.body))
+                    flag = False
                     s.reset((10, 10))
                     break
 
             self.redrawWindow()
-        font = pygame.font.SysFont(None, 24)
-
-        img = font.render('hello', True, color=(255, 255, 255))
-        self.fenetre.blit(img, (20, 20))
-
-        self._fenetre = jeu.fenetre
-        jeu.fond = (0, 0, 0)
-        self.drawGrid()
+            pygame.display.set_caption(
+                "Snake python - Score : " + str(len(s.body)))
+        pygame.quit()
 
     def redrawWindow(self):
         self.fenetre.fill((0, 0, 0))
@@ -486,12 +460,7 @@ class Jeu:
         # self._fenetre.blit(self.texte, self.rectTexte)
         print(events)
         for event in events:
-            if event.type == self._CLIGNOTER:
-                self.creerTexte()
-                break
-
-    def detruire(self):
-        pygame.time.set_timer(self._CLIGNOTER, 0)  # désactivation du timer
+            self.jeu.menu
 
 
 app = Application()
